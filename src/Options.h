@@ -14,10 +14,13 @@
 #ifndef _OPTIONS_H_INCLUDED
 #define _OPTIONS_H_INCLUDED
 
+#include "PsramAllocator.h"
+
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
+#include <new>
 
 #define OPTION_TYPE_unknown   '\0'
 #define OPTION_TYPE_boolean   'b'
@@ -66,6 +69,24 @@ class Option_register {
 		std::string       m_modifiedOption;
 		bool              m_modifiedQ;
 		char              m_type;
+
+	public:
+		// Override operator new/delete to use PSRAM
+		void* operator new(size_t size) {
+			return ps_malloc_impl(size);
+		}
+		
+		void operator delete(void* ptr) {
+			ps_free_impl(ptr);
+		}
+		
+		void* operator new[](size_t size) {
+			return ps_malloc_impl(size);
+		}
+		
+		void operator delete[](void* ptr) {
+			ps_free_impl(ptr);
+		}
 
 };
 

@@ -14,8 +14,10 @@
 #define _MIDIEVENTLIST_H_INCLUDED
 
 #include "MidiEvent.h"
+#include "PsramAllocator.h"
 
 #include <vector>
+#include <new>
 
 
 namespace smf {
@@ -79,6 +81,24 @@ class MidiEventList {
 	static int eventCompareNoteOffsBeforeOns(const void* a, const void* b);
 	static int eventCompareNoteOnsBeforeOffs(const void* a, const void* b);
 	static int eventCompare(const void* a, const void* b) { return eventCompareNoteOnsBeforeOffs(a, b); }
+	
+	public:
+		// Override operator new/delete to use PSRAM
+		void* operator new(size_t size) {
+			return ps_malloc_impl(size);
+		}
+		
+		void operator delete(void* ptr) {
+			ps_free_impl(ptr);
+		}
+		
+		void* operator new[](size_t size) {
+			return ps_malloc_impl(size);
+		}
+		
+		void operator delete[](void* ptr) {
+			ps_free_impl(ptr);
+		}
 };
 
 

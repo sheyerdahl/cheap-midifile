@@ -265,10 +265,6 @@ class MidiFile {
 		                                              float value);
 		static std::ostream& writeBigEndianFloat     (std::ostream& out,
 		                                              float value);
-		static std::ostream& writeLittleEndianFloat (std::ostream& out,
-		                                              float value);
-		static std::ostream& writeBigEndianFloat    (std::ostream& out,
-		                                              float value);
 		static std::string   getGMInstrumentName     (int patchIndex);
 
 	protected:

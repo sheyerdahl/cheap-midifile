@@ -14,6 +14,7 @@
 
 #include "MidiFile.h"
 #include "Binasc.h"
+#include "PsramAllocator.h"
 
 #include <algorithm>
 #include <fstream>
@@ -1280,7 +1281,7 @@ void MidiFile::makeDeltaTicks(void) {
 	int i, j;
 	int temp;
 	int length = getNumTracks();
-	int *timedata = new int[length];
+	int *timedata = (int*)ps_calloc_impl(length, sizeof(int));
 	for (i=0; i<length; i++) {
 		timedata[i] = 0;
 		if (m_events[i]->size() > 0) {
@@ -1301,7 +1302,7 @@ void MidiFile::makeDeltaTicks(void) {
 		}
 	}
 	m_theTimeState = TIME_STATE_DELTA;
-	delete [] timedata;
+	ps_free_impl(timedata);
 }
 
 //
@@ -1330,7 +1331,7 @@ void MidiFile::makeAbsoluteTicks(void) {
 	}
 	int i, j;
 	int length = getNumTracks();
-	int* timedata = new int[length];
+	int* timedata = (int*)ps_calloc_impl(length, sizeof(int));
 	for (i=0; i<length; i++) {
 		timedata[i] = 0;
 		if (m_events[i]->size() > 0) {
@@ -1344,7 +1345,7 @@ void MidiFile::makeAbsoluteTicks(void) {
 		}
 	}
 	m_theTimeState = TIME_STATE_ABSOLUTE;
-	delete [] timedata;
+	ps_free_impl(timedata);
 }
 
 //
@@ -3361,48 +3362,6 @@ std::ostream& MidiFile::writeLittleEndianFloat(std::ostream& out, float value) {
 	out << data.bytes[1];
 	out << data.bytes[2];
 	out << data.bytes[3];
-	return out;
-}
-
-
-
-//////////////////////////////
-//
-// MidiFile::writeBigEndianFloat --
-//
-
-std::ostream& MidiFile::writeBigEndianFloat(std::ostream& out, float value) {
-	union { char bytes[8]; float d; } data;
-	data.d = value;
-	out << data.bytes[7];
-	out << data.bytes[6];
-	out << data.bytes[5];
-	out << data.bytes[4];
-	out << data.bytes[3];
-	out << data.bytes[2];
-	out << data.bytes[1];
-	out << data.bytes[0];
-	return out;
-}
-
-
-
-//////////////////////////////
-//
-// MidiFile::writeLittleEndianFloat --
-//
-
-std::ostream& MidiFile::writeLittleEndianFloat(std::ostream& out, float value) {
-	union { char bytes[8]; float d; } data;
-	data.d = value;
-	out << data.bytes[0];
-	out << data.bytes[1];
-	out << data.bytes[2];
-	out << data.bytes[3];
-	out << data.bytes[4];
-	out << data.bytes[5];
-	out << data.bytes[6];
-	out << data.bytes[7];
 	return out;
 }
 

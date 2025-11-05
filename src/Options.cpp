@@ -580,7 +580,7 @@ std::string Options::getDefinition(const std::string& optionName) {
 //
 
 float Options::getFloat(const std::string& optionName) {
-	return strtod(getString(optionName).c_str(), (char**)NULL);
+	return (float)strtod(getString(optionName).c_str(), (char**)NULL);
 }
 
 
@@ -593,18 +593,6 @@ float Options::getFloat(const std::string& optionName) {
 
 char Options::getChar(const std::string& optionName) {
 	return getString(optionName).c_str()[0];
-}
-
-
-
-//////////////////////////////
-//
-// Options::getFloat -- Return the floating point number
-//	associated with the given option.
-//
-
-float Options::getFloat(const std::string& optionName) {
-	return (float)getFloat(optionName);
 }
 
 

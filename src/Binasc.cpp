@@ -1332,17 +1332,9 @@ int Binasc::processDecimalWord(std::ostream& out, const std::string& word,
 	// process any floating point numbers possibilities
 	if (periodIndex != -1) {
 		float floatOutput = atof(&word[quoteIndex+1]);
-		float  floatOutput  = (float)floatOutput;
+		// float  floatOutput  = (float)floatOutput; // TODO: remove this
 		switch (byteCount) {
 			case 4:
-			  if (endianIndex == -1) {
-				  writeBigEndianFloat(out, floatOutput);
-			  } else {
-				  writeLittleEndianFloat(out, floatOutput);
-			  }
-			  return 1;
-			  break;
-			case 8:
 			  if (endianIndex == -1) {
 				  writeBigEndianFloat(out, floatOutput);
 			  } else {
@@ -1960,48 +1952,6 @@ std::ostream& Binasc::writeLittleEndianFloat(std::ostream& out, float value) {
 	out << data.bytes[1];
 	out << data.bytes[2];
 	out << data.bytes[3];
-	return out;
-}
-
-
-
-//////////////////////////////
-//
-// Binasc::writeBigEndianFloat --
-//
-
-std::ostream& Binasc::writeBigEndianFloat(std::ostream& out, float value) {
-	union { char bytes[8]; float d; } data;
-	data.d = value;
-	out << data.bytes[7];
-	out << data.bytes[6];
-	out << data.bytes[5];
-	out << data.bytes[4];
-	out << data.bytes[3];
-	out << data.bytes[2];
-	out << data.bytes[1];
-	out << data.bytes[0];
-	return out;
-}
-
-
-
-//////////////////////////////
-//
-// Binasc::writeLittleEndianFloat --
-//
-
-std::ostream& Binasc::writeLittleEndianFloat(std::ostream& out, float value) {
-	union { char bytes[8]; float d; } data;
-	data.d = value;
-	out << data.bytes[0];
-	out << data.bytes[1];
-	out << data.bytes[2];
-	out << data.bytes[3];
-	out << data.bytes[4];
-	out << data.bytes[5];
-	out << data.bytes[6];
-	out << data.bytes[7];
 	return out;
 }
 

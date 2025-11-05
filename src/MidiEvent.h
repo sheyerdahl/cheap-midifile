@@ -15,9 +15,11 @@
 #define _MIDIEVENT_H_INCLUDED
 
 #include "MidiMessage.h"
+#include "PsramAllocator.h"
 
 #include <ostream>
 #include <vector>
+#include <new>
 
 
 namespace smf {
@@ -65,6 +67,24 @@ class MidiEvent : public MidiMessage {
 
 	private:
 		MidiEvent* m_eventlink;  // used to match note-ons and note-offs
+
+	public:
+		// Override operator new/delete to use PSRAM
+		void* operator new(size_t size) {
+			return ps_malloc_impl(size);
+		}
+		
+		void operator delete(void* ptr) {
+			ps_free_impl(ptr);
+		}
+		
+		void* operator new[](size_t size) {
+			return ps_malloc_impl(size);
+		}
+		
+		void operator delete[](void* ptr) {
+			ps_free_impl(ptr);
+		}
 
 };
 
