@@ -37,7 +37,7 @@ enum {
 class _TickTime {
 	public:
 		int    tick;
-		double seconds;
+		float seconds;
 };
 
 
@@ -137,12 +137,12 @@ class MidiFile {
 
 		// physical-time analysis functions:
 		void             doTimeAnalysis            (void);
-		double           getTimeInSeconds          (int aTrack, int anIndex);
-		double           getTimeInSeconds          (int tickvalue);
-		double           getAbsoluteTickTime       (double starttime);
+		float           getTimeInSeconds          (int aTrack, int anIndex);
+		float           getTimeInSeconds          (int tickvalue);
+		float           getAbsoluteTickTime       (float starttime);
 		int              getFileDurationInTicks    (void);
-		double           getFileDurationInQuarters (void);
-		double           getFileDurationInSeconds  (void);
+		float           getFileDurationInQuarters (void);
+		float           getFileDurationInSeconds  (void);
 
 		// note-analysis functions:
 		int              linkNotePairsFIFO         (void);
@@ -186,11 +186,11 @@ class MidiFile {
 		MidiEvent*        addTimbre               (int aTrack, int aTick,
 		                                           int aChannel, int patchnum);
 		MidiEvent*        addPitchBend            (int aTrack, int aTick,
-		                                           int aChannel, double amount);
+		                                           int aChannel, float amount);
 
 		// RPN settings:
 		void              setPitchBendRange       (int aTrack, int aTick,
-		                                           int aChannel, double range);
+		                                           int aChannel, float range);
 
 		// Controller message adding convenience functions:
 		MidiEvent*        addSustain              (int aTrack, int aTick,
@@ -228,7 +228,7 @@ class MidiFile {
 		MidiEvent*         addCue                 (int aTrack, int aTick,
 		                                           const std::string& text);
 		MidiEvent*         addTempo               (int aTrack, int aTick,
-		                                           double aTempo);
+		                                           float aTempo);
 		MidiEvent*         addKeySignature        (int aTrack, int aTick,
 		                                           int fifths, bool mode = 0);
 		MidiEvent*         addTimeSignature       (int aTrack, int aTick,
@@ -265,10 +265,10 @@ class MidiFile {
 		                                              float value);
 		static std::ostream& writeBigEndianFloat     (std::ostream& out,
 		                                              float value);
-		static std::ostream& writeLittleEndianDouble (std::ostream& out,
-		                                              double value);
-		static std::ostream& writeBigEndianDouble    (std::ostream& out,
-		                                              double value);
+		static std::ostream& writeLittleEndianFloat (std::ostream& out,
+		                                              float value);
+		static std::ostream& writeBigEndianFloat    (std::ostream& out,
+		                                              float value);
 		static std::string   getGMInstrumentName     (int patchIndex);
 
 	protected:
@@ -320,8 +320,8 @@ class MidiFile {
 		static int  ticksearch                      (const void* A, const void* B);
 		static int  secondsearch                    (const void* A, const void* B);
 		void        buildTimeMap                    (void);
-		double      linearTickInterpolationAtSecond (double seconds);
-		double      linearSecondInterpolationAtTick (int ticktime);
+		float      linearTickInterpolationAtSecond (float seconds);
+		float      linearSecondInterpolationAtTick (int ticktime);
 		std::string base64Encode                    (const std::string &input);
 		std::string base64Decode                    (const std::string &input);
 

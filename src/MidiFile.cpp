@@ -1434,8 +1434,8 @@ int MidiFile::getFileDurationInTicks(void) {
 //    while in absolute tick (default) mode.
 //
 
-double MidiFile::getFileDurationInQuarters(void) {
-	return (double)getFileDurationInTicks() / (double)getTicksPerQuarterNote();
+float MidiFile::getFileDurationInQuarters(void) {
+	return (float)getFileDurationInTicks() / (float)getTicksPerQuarterNote();
 }
 
 
@@ -1450,7 +1450,7 @@ double MidiFile::getFileDurationInQuarters(void) {
 //    will temporarily go to absolute tick mode for the calculation
 //    of the max time.
 
-double MidiFile::getFileDurationInSeconds(void) {
+float MidiFile::getFileDurationInSeconds(void) {
 	if (m_timemapvalid == 0) {
 		buildTimeMap();
 		if (m_timemapvalid == 0) {
@@ -1463,7 +1463,7 @@ double MidiFile::getFileDurationInSeconds(void) {
 		revertToDelta = true;
 	}
 	const MidiFile& mf = *this;
-	double output = 0.0;
+	float output = 0.0;
 	for (int i=0; i<mf.getTrackCount(); i++) {
 		if (mf[i].back().seconds > output) {
 			output = mf[i].back().seconds;
@@ -1500,12 +1500,12 @@ void MidiFile::doTimeAnalysis(void) {
 //     the current message.
 //
 
-double MidiFile::getTimeInSeconds(int aTrack, int anIndex) {
+float MidiFile::getTimeInSeconds(int aTrack, int anIndex) {
 	return getTimeInSeconds(getEvent(aTrack, anIndex).tick);
 }
 
 
-double MidiFile::getTimeInSeconds(int tickvalue) {
+float MidiFile::getTimeInSeconds(int tickvalue) {
 	if (m_timemapvalid == 0) {
 		buildTimeMap();
 		if (m_timemapvalid == 0) {
@@ -1542,7 +1542,7 @@ double MidiFile::getTimeInSeconds(int tickvalue) {
 //    the given time in seconds, then interpolate between two values.
 //
 
-double MidiFile::getAbsoluteTickTime(double starttime) {
+float MidiFile::getAbsoluteTickTime(float starttime) {
 	if (m_timemapvalid == 0) {
 		buildTimeMap();
 		if (m_timemapvalid == 0) {
@@ -1857,7 +1857,7 @@ MidiEvent* MidiFile::addCue(int aTrack, int aTick, const std::string& text) {
 // MidiFile::addTempo -- Add a tempo meta message (meta #0x51).
 //
 
-MidiEvent* MidiFile::addTempo(int aTrack, int aTick, double aTempo) {
+MidiEvent* MidiFile::addTempo(int aTrack, int aTick, float aTempo) {
 	MidiEvent* me = new MidiEvent;
 	me->makeTempo(aTempo);
 	me->tick = aTick;
@@ -2106,7 +2106,7 @@ MidiEvent* MidiFile::addTimbre(int aTrack, int aTick, int aChannel, int patchnum
 //   +1.0 maps to 16383 (0x3FFF --> 0x7F 0x7F)
 //
 
-MidiEvent* MidiFile::addPitchBend(int aTrack, int aTick, int aChannel, double amount) {
+MidiEvent* MidiFile::addPitchBend(int aTrack, int aTick, int aChannel, float amount) {
 	m_timemapvalid = 0;
 	amount += 1.0;
 	int value = int(amount * 8192 + 0.5);
@@ -2151,7 +2151,7 @@ MidiEvent* MidiFile::addPitchBend(int aTrack, int aTick, int aChannel, double am
 //   which is two semitones plus a quarter tone.
 //
 
-void MidiFile::setPitchBendRange(int aTrack, int aTick, int aChannel, double range) {
+void MidiFile::setPitchBendRange(int aTrack, int aTick, int aChannel, float range) {
 	if (range < 0.0) {
 		range = -range;
 	}
@@ -2599,7 +2599,7 @@ void MidiFile::clearLinks(void) {
 //    given input time.
 //
 
-double MidiFile::linearTickInterpolationAtSecond(double seconds) {
+float MidiFile::linearTickInterpolationAtSecond(float seconds) {
 	if (m_timemapvalid == 0) {
 		buildTimeMap();
 		if (m_timemapvalid == 0) {
@@ -2608,7 +2608,7 @@ double MidiFile::linearTickInterpolationAtSecond(double seconds) {
 	}
 
 	int i;
-	double lasttime = m_timemap[m_timemap.size()-1].seconds;
+	float lasttime = m_timemap[m_timemap.size()-1].seconds;
 	// give an error value of -1 if time is out of range of data.
 	if (seconds < 0.0) {
 		return -1.0;
@@ -2650,11 +2650,11 @@ double MidiFile::linearTickInterpolationAtSecond(double seconds) {
 		return -1.0;
 	}
 
-	double x1 = m_timemap[startindex].seconds;
-	double x2 = m_timemap[startindex+1].seconds;
-	double y1 = m_timemap[startindex].tick;
-	double y2 = m_timemap[startindex+1].tick;
-	double xi = seconds;
+	float x1 = m_timemap[startindex].seconds;
+	float x2 = m_timemap[startindex+1].seconds;
+	float y1 = m_timemap[startindex].tick;
+	float y2 = m_timemap[startindex+1].tick;
+	float xi = seconds;
 
 	return (xi-x1) * ((y2-y1)/(x2-x1)) + y1;
 }
@@ -2664,10 +2664,10 @@ double MidiFile::linearTickInterpolationAtSecond(double seconds) {
 //////////////////////////////
 //
 // MidiFile::linearSecondInterpolationAtTick -- return the time in seconds
-//    value at the given input tick time. (Ticks input could be made double).
+//    value at the given input tick time. (Ticks input could be made float).
 //
 
-double MidiFile::linearSecondInterpolationAtTick(int ticktime) {
+float MidiFile::linearSecondInterpolationAtTick(int ticktime) {
 	if (m_timemapvalid == 0) {
 		buildTimeMap();
 		if (m_timemapvalid == 0) {
@@ -2676,7 +2676,7 @@ double MidiFile::linearSecondInterpolationAtTick(int ticktime) {
 	}
 
 	int i;
-	double lasttick = m_timemap[m_timemap.size()-1].tick;
+	float lasttick = m_timemap[m_timemap.size()-1].tick;
 	// give an error value of -1 if time is out of range of data.
 	if (ticktime < 0.0) {
 		return -1;
@@ -2722,11 +2722,11 @@ double MidiFile::linearSecondInterpolationAtTick(int ticktime) {
 		return m_timemap[startindex].seconds;
 	}
 
-	double x1 = m_timemap[startindex].tick;
-	double x2 = m_timemap[startindex+1].tick;
-	double y1 = m_timemap[startindex].seconds;
-	double y2 = m_timemap[startindex+1].seconds;
-	double xi = ticktime;
+	float x1 = m_timemap[startindex].tick;
+	float x2 = m_timemap[startindex+1].tick;
+	float y1 = m_timemap[startindex].seconds;
+	float y2 = m_timemap[startindex+1].seconds;
+	float xi = ticktime;
 
 	return (xi-x1) * ((y2-y1)/(x2-x1)) + y1;
 }
@@ -2770,11 +2770,11 @@ void MidiFile::buildTimeMap(void) {
 
 	int i;
 	int tpq = getTicksPerQuarterNote();
-	double defaultTempo = 120.0;
-	double secondsPerTick = 60.0 / (defaultTempo * tpq);
+	float defaultTempo = 120.0;
+	float secondsPerTick = 60.0 / (defaultTempo * tpq);
 
-	double lastsec = 0.0;
-	double cursec = 0.0;
+	float lastsec = 0.0;
+	float cursec = 0.0;
 
 	for (i=0; i<getNumEvents(0); i++) {
 		int curtick = getEvent(0, i).tick;
@@ -3368,11 +3368,11 @@ std::ostream& MidiFile::writeLittleEndianFloat(std::ostream& out, float value) {
 
 //////////////////////////////
 //
-// MidiFile::writeBigEndianDouble --
+// MidiFile::writeBigEndianFloat --
 //
 
-std::ostream& MidiFile::writeBigEndianDouble(std::ostream& out, double value) {
-	union { char bytes[8]; double d; } data;
+std::ostream& MidiFile::writeBigEndianFloat(std::ostream& out, float value) {
+	union { char bytes[8]; float d; } data;
 	data.d = value;
 	out << data.bytes[7];
 	out << data.bytes[6];
@@ -3389,11 +3389,11 @@ std::ostream& MidiFile::writeBigEndianDouble(std::ostream& out, double value) {
 
 //////////////////////////////
 //
-// MidiFile::writeLittleEndianDouble --
+// MidiFile::writeLittleEndianFloat --
 //
 
-std::ostream& MidiFile::writeLittleEndianDouble(std::ostream& out, double value) {
-	union { char bytes[8]; double d; } data;
+std::ostream& MidiFile::writeLittleEndianFloat(std::ostream& out, float value) {
+	union { char bytes[8]; float d; } data;
 	data.d = value;
 	out << data.bytes[0];
 	out << data.bytes[1];

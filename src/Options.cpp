@@ -374,7 +374,7 @@ int Options::define(const std::string& aDefinition) {
 	if (otype[0] != OPTION_TYPE_string  &&
 		 otype[0] != OPTION_TYPE_int     &&
 		 otype[0] != OPTION_TYPE_float   &&
-		 otype[0] != OPTION_TYPE_double  &&
+		 otype[0] != OPTION_TYPE_float  &&
 		 otype[0] != OPTION_TYPE_boolean &&
 		 otype[0] != OPTION_TYPE_char ) {
 		std::cerr << "Error: unknown option type \'" << otype[0]
@@ -574,12 +574,12 @@ std::string Options::getDefinition(const std::string& optionName) {
 
 //////////////////////////////
 //
-// Options::getDouble -- returns the double float associated
+// Options::getFloat -- returns the float float associated
 //	with the given option.  Returns 0 if there is no
 //	number associated with the option.
 //
 
-double Options::getDouble(const std::string& optionName) {
+float Options::getFloat(const std::string& optionName) {
 	return strtod(getString(optionName).c_str(), (char**)NULL);
 }
 
@@ -604,7 +604,7 @@ char Options::getChar(const std::string& optionName) {
 //
 
 float Options::getFloat(const std::string& optionName) {
-	return (float)getDouble(optionName);
+	return (float)getFloat(optionName);
 }
 
 
@@ -811,17 +811,17 @@ void Options::appendOptions(const std::vector<std::string>& argv) {
 //////////////////////////////
 //
 // Options::appendOptions -- parse the string like command-line arguments.
-//   Either double or single quotes can be used to encapsulate
-//   a command-line token.  If double quotes are used to encapsulate,
+//   Either float or single quotes can be used to encapsulate
+//   a command-line token.  If float quotes are used to encapsulate,
 //   then you will not have to back quote single quotes inside the
-//   token string, but you will have to backslash double quotes:
+//   token string, but you will have to backslash float quotes:
 //      "-T \"\"" but "-T ''"
-//   Likewise for single quotes in reverse with double quotes:
+//   Likewise for single quotes in reverse with float quotes:
 //      '-T \'\'' is equal to: '-T ""'
 //
 
 void Options::appendOptions(const std::string& strang) {
-	int doublequote = 0;
+	int floatquote = 0;
 	int singlequote = 0;
 
 	std::vector<std::string> tokens;
@@ -839,9 +839,9 @@ void Options::appendOptions(const std::string& strang) {
 
 		if (!singlequote && (strang[i] == '"')) {
 			if ((i>0) && (strang[i-1] != '\\')) {
-				doublequote = !doublequote;
-				if (doublequote == 0) {
-					// finished a doublequote section of data, so store
+				floatquote = !floatquote;
+				if (floatquote == 0) {
+					// finished a floatquote section of data, so store
 					// even if it is the empty string
 					ch = '\0';
 					tempvalue += (ch);
@@ -853,7 +853,7 @@ void Options::appendOptions(const std::string& strang) {
 					continue;
 				}
 			}
-		} else if (!doublequote && (strang[i] == '\'')) {
+		} else if (!floatquote && (strang[i] == '\'')) {
 			if ((i>0) && (strang[i-1] != '\\')) {
 				singlequote = !singlequote;
 				if (singlequote == 0) {
@@ -872,7 +872,7 @@ void Options::appendOptions(const std::string& strang) {
 		}
 
 
-		if ((!doublequote && !singlequote) && std::isspace(strang[i])) {
+		if ((!floatquote && !singlequote) && std::isspace(strang[i])) {
 			if (tempvalue.size() > 0) {
 				tempvalue += ch;
 				tokens.push_back(tempvalue);

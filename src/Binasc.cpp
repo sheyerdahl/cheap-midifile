@@ -864,7 +864,7 @@ int Binasc::readMidiEvent(std::ostream& out, std::istream& infile,
 						    infile.read((char*)&ch, 1);
 						    trackbytes++;
 						    number = (number << 8) | ch;
-						    double tempo = 1000000.0 / number * 60.0;
+						    float tempo = 1000000.0 / number * 60.0;
 						    output << " t" << tempo;
 						    }
 						    break;
@@ -1314,7 +1314,7 @@ int Binasc::processDecimalWord(std::ostream& out, const std::string& word,
 		return 0;
 	}
 
-	// 8 byte decimal output can only occur if reading a double number
+	// 8 byte decimal output can only occur if reading a float number
 	if (periodIndex == -1 && byteCount == 8) {
 		std::cerr << "Error on line " << lineNum << " at token: " << word
 			  << std::endl;
@@ -1331,8 +1331,8 @@ int Binasc::processDecimalWord(std::ostream& out, const std::string& word,
 
 	// process any floating point numbers possibilities
 	if (periodIndex != -1) {
-		double doubleOutput = atof(&word[quoteIndex+1]);
-		float  floatOutput  = (float)doubleOutput;
+		float floatOutput = atof(&word[quoteIndex+1]);
+		float  floatOutput  = (float)floatOutput;
 		switch (byteCount) {
 			case 4:
 			  if (endianIndex == -1) {
@@ -1344,9 +1344,9 @@ int Binasc::processDecimalWord(std::ostream& out, const std::string& word,
 			  break;
 			case 8:
 			  if (endianIndex == -1) {
-				  writeBigEndianDouble(out, doubleOutput);
+				  writeBigEndianFloat(out, floatOutput);
 			  } else {
-				  writeLittleEndianDouble(out, doubleOutput);
+				  writeLittleEndianFloat(out, floatOutput);
 			  }
 			  return 1;
 			  break;
@@ -1738,7 +1738,7 @@ int Binasc::processMidiTempoWord(std::ostream& out, const std::string& word,
 			  << "a floating-point number" << std::endl;
 		return 0;
 	}
-	double value = strtod(&word[1], NULL);
+	float value = strtod(&word[1], NULL);
 
 	if (value < 0.0) {
 		value = -value;
@@ -1779,7 +1779,7 @@ int Binasc::processMidiPitchBendWord(std::ostream& out, const std::string& word,
 			  << "a floating-point number" << std::endl;
 		return 0;
 	}
-	double value = strtod(&word[1], NULL);
+	float value = strtod(&word[1], NULL);
 
 	if (value > 1.0) {
 		value = 1.0;
@@ -1967,11 +1967,11 @@ std::ostream& Binasc::writeLittleEndianFloat(std::ostream& out, float value) {
 
 //////////////////////////////
 //
-// Binasc::writeBigEndianDouble --
+// Binasc::writeBigEndianFloat --
 //
 
-std::ostream& Binasc::writeBigEndianDouble(std::ostream& out, double value) {
-	union { char bytes[8]; double d; } data;
+std::ostream& Binasc::writeBigEndianFloat(std::ostream& out, float value) {
+	union { char bytes[8]; float d; } data;
 	data.d = value;
 	out << data.bytes[7];
 	out << data.bytes[6];
@@ -1988,11 +1988,11 @@ std::ostream& Binasc::writeBigEndianDouble(std::ostream& out, double value) {
 
 //////////////////////////////
 //
-// Binasc::writeLittleEndianDouble --
+// Binasc::writeLittleEndianFloat --
 //
 
-std::ostream& Binasc::writeLittleEndianDouble(std::ostream& out, double value) {
-	union { char bytes[8]; double d; } data;
+std::ostream& Binasc::writeLittleEndianFloat(std::ostream& out, float value) {
+	union { char bytes[8]; float d; } data;
 	data.d = value;
 	out << data.bytes[0];
 	out << data.bytes[1];

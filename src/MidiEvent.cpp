@@ -271,12 +271,12 @@ int MidiEvent::getTickDuration(void) const {
 //     reported as zero.
 //
 
-double MidiEvent::getDurationInSeconds(void) const {
+float MidiEvent::getDurationInSeconds(void) const {
 	const MidiEvent* mev = getLinkedEvent();
 	if (mev == NULL) {
 		return 0;
 	}
-	double seconds2 = mev->seconds;
+	float seconds2 = mev->seconds;
 	if (seconds2 > seconds) {
 		return seconds2 - seconds;
 	} else {

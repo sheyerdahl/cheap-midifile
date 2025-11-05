@@ -230,12 +230,12 @@ int MidiMessage::getTempoMicroseconds(void) const {
 //      tempo meta message.
 //
 
-double MidiMessage::getTempoSeconds(void) const {
+float MidiMessage::getTempoSeconds(void) const {
 	int microseconds = getTempoMicroseconds();
 	if (microseconds < 0) {
 		return -1.0;
 	} else {
-		return (double)microseconds / 1000000.0;
+		return (float)microseconds / 1000000.0;
 	}
 }
 
@@ -247,12 +247,12 @@ double MidiMessage::getTempoSeconds(void) const {
 //   Returns -1 if the MidiMessage is note a tempo meta message.
 //
 
-double MidiMessage::getTempoBPM(void) const {
+float MidiMessage::getTempoBPM(void) const {
 	int microseconds = getTempoMicroseconds();
 	if (microseconds < 0) {
 		return -1.0;
 	}
-	return 60000000.0 / (double)microseconds;
+	return 60000000.0 / (float)microseconds;
 }
 
 
@@ -262,12 +262,12 @@ double MidiMessage::getTempoBPM(void) const {
 // MidiMessage::getTempoTPS -- Returns the tempo in terms of ticks per seconds.
 //
 
-double MidiMessage::getTempoTPS(int tpq) const {
+float MidiMessage::getTempoTPS(int tpq) const {
 	int microseconds = getTempoMicroseconds();
 	if (microseconds < 0) {
 		return -1.0;
 	} else {
-		return tpq * 1000000.0 / (double)microseconds;
+		return tpq * 1000000.0 / (float)microseconds;
 	}
 }
 
@@ -278,12 +278,12 @@ double MidiMessage::getTempoTPS(int tpq) const {
 // MidiMessage::getTempoSPT -- Returns the tempo in terms of seconds per tick.
 //
 
-double MidiMessage::getTempoSPT(int tpq) const {
+float MidiMessage::getTempoSPT(int tpq) const {
 	int microseconds = getTempoMicroseconds();
 	if (microseconds < 0) {
 		return -1.0;
 	} else {
-		return (double)microseconds / 1000000.0 / tpq;
+		return (float)microseconds / 1000000.0 / tpq;
 	}
 }
 
@@ -1243,7 +1243,7 @@ void MidiMessage::setMessage(const std::vector<int>& message) {
 // MidiMessage::setSpelling -- Encode a MidiPlus accidental state for a note.
 //    For example, if a note's key number is 60, the enharmonic pitch name
 //    could be any of these possibilities:
-//        C, B-sharp, D-double-flat
+//        C, B-sharp, D-float-flat
 //    MIDI note 60 is ambiguous as to which of these names are intended,
 //    so MIDIPlus allows these mappings to be preserved for later recovery.
 //    See Chapter 5 (pp. 99-104) of Beyond MIDI (1997).
@@ -1259,8 +1259,8 @@ void MidiMessage::setMessage(const std::vector<int>& message) {
 //       octave * 7 + 6 = B pitches
 //
 //    The second parameter is the semitone alteration (accidental).
-//    0 = natural state, 1 = sharp, 2 = double sharp, -1 = flat,
-//    -2 = double flat.
+//    0 = natural state, 1 = sharp, 2 = float sharp, -1 = flat,
+//    -2 = float flat.
 //
 //    Only note-on messages can be processed (other messages will be
 //    silently ignored).
@@ -1571,7 +1571,7 @@ void MidiMessage::setMetaContent(const std::string& content) {
 //   (meta message #0x51).
 //
 
-void MidiMessage::setMetaTempo(double tempo) {
+void MidiMessage::setMetaTempo(float tempo) {
 	int microseconds = (int)(60.0 / tempo * 1000000.0 + 0.5);
 	setTempoMicroseconds(microseconds);
 }
@@ -1583,7 +1583,7 @@ void MidiMessage::setMetaTempo(double tempo) {
 // MidiMessage::setTempo -- Alias for MidiMessage::setMetaTempo().
 //
 
-void MidiMessage::setTempo(double tempo) {
+void MidiMessage::setTempo(float tempo) {
 	setMetaTempo(tempo);
 }
 
@@ -1812,10 +1812,10 @@ void MidiMessage::makePitchBend(int channel, int value) {
 // Input value is a number between -1.0 and +1.0.
 //
 
-void MidiMessage::makePitchBendDouble(int channel, double value) {
+void MidiMessage::makePitchBendFloat(int channel, float value) {
 	// value is in the range from -1 for minimum and 2^18 - 1 for the maximum
 	resize(0);
-	double dvalue = (value + 1.0) * (pow(2.0, 15.0));
+	float dvalue = (value + 1.0) * (pow(2.0, 15.0));
 	if (dvalue < 0.0) {
 		dvalue = 0.0;
 	}
@@ -2043,7 +2043,7 @@ std::vector<uchar> MidiMessage::intToVlv(int value) {
 //////////////////////////////
 //
 // MidiMessage::makeSysExMessage -- Add F0 at start and F7 at end (do not include
-//    in data, but they will be double-checked for and ignored if found.
+//    in data, but they will be float-checked for and ignored if found.
 //
 
 void MidiMessage::makeSysExMessage(const std::vector<uchar>& data) {
@@ -2085,14 +2085,14 @@ void MidiMessage::makeSysExMessage(const std::vector<uchar>& data) {
 //     if too low, and returns 127.0 if too high.
 //
 
-double MidiMessage::frequencyToSemitones(double frequency, double a4frequency) {
+float MidiMessage::frequencyToSemitones(float frequency, float a4frequency) {
 	if (frequency < 1) {
 		return 0.0;
 	}
 	if (a4frequency <= 0) {
 		return 0.0;
 	}
-	double semitones = 69.0 + 12.0 * log2(frequency/a4frequency);
+	float semitones = 69.0 + 12.0 * log2(frequency/a4frequency);
 	if (semitones >= 128.0) {
 		return 127.0;
 	} else if (semitones < 0.0) {
@@ -2108,20 +2108,20 @@ double MidiMessage::frequencyToSemitones(double frequency, double a4frequency) {
 // MidiMessage::makeMts2_KeyTuningsByFrequency -- Map a list of key numbers to specific pitches by frequency.
 //
 
-void MidiMessage::makeMts2_KeyTuningsByFrequency(int key, double frequency, int program) {
-	std::vector<std::pair<int, double>> mapping;
+void MidiMessage::makeMts2_KeyTuningsByFrequency(int key, float frequency, int program) {
+	std::vector<std::pair<int, float>> mapping;
 	mapping.push_back(std::make_pair(key, frequency));
 	this->makeMts2_KeyTuningsByFrequency(mapping, program);
 }
 
 
-void MidiMessage::makeMts2_KeyTuningByFrequency(int key, double frequency, int program) {
+void MidiMessage::makeMts2_KeyTuningByFrequency(int key, float frequency, int program) {
 	this->makeMts2_KeyTuningsByFrequency(key, frequency, program);
 }
 
 
-void MidiMessage::makeMts2_KeyTuningsByFrequency(std::vector<std::pair<int, double>>& mapping, int program) {
-	std::vector<std::pair<int, double>> semimap(mapping.size());
+void MidiMessage::makeMts2_KeyTuningsByFrequency(std::vector<std::pair<int, float>>& mapping, int program) {
+	std::vector<std::pair<int, float>> semimap(mapping.size());
 	for (int i=0; i<(int)mapping.size(); i++) {
 		semimap[i].first = mapping[i].first;
 		semimap[i].second = MidiMessage::frequencyToSemitones(mapping[i].second);
@@ -2137,19 +2137,19 @@ void MidiMessage::makeMts2_KeyTuningsByFrequency(std::vector<std::pair<int, doub
 //    semitones (MIDI key numbers with fractional values).
 //
 
-void MidiMessage::makeMts2_KeyTuningsBySemitone(int key, double semitone, int program) {
-	std::vector<std::pair<int, double>> semimap;
+void MidiMessage::makeMts2_KeyTuningsBySemitone(int key, float semitone, int program) {
+	std::vector<std::pair<int, float>> semimap;
 	semimap.push_back(std::make_pair(key, semitone));
 	this->makeMts2_KeyTuningsBySemitone(semimap, program);
 }
 
 
-void MidiMessage::makeMts2_KeyTuningBySemitone(int key, double semitone, int program) {
+void MidiMessage::makeMts2_KeyTuningBySemitone(int key, float semitone, int program) {
 	this->makeMts2_KeyTuningsBySemitone(key, semitone, program);
 }
 
 
-void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, double>>& mapping, int program) {
+void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, float>>& mapping, int program) {
 	if (program < 0) {
 		program = 0;
 	} else if (program > 127) {
@@ -2174,7 +2174,7 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 			keynum = 127;
 		}
 		data.push_back((uchar)keynum);
-		double semitones = item.second;
+		float semitones = item.second;
 		int sint = (int)semitones;
 		if (sint < 0) {
 			sint = 0;
@@ -2182,7 +2182,7 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 			sint = 127;
 		}
 		data.push_back((uchar)sint);
-		double fraction = semitones - sint;
+		float fraction = semitones - sint;
 		int value = int(fraction * (1 << 14));
 		uchar lsb = value & 0x7f;
 		uchar msb = (value >> 7) & 0x7f;
@@ -2199,7 +2199,7 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 // MidiMessage::makeMts9_TemperamentByCentsDeviationFromET --
 //
 
-void MidiMessage::makeMts9_TemperamentByCentsDeviationFromET (std::vector<double>& mapping, int referencePitchClass, int channelMask) {
+void MidiMessage::makeMts9_TemperamentByCentsDeviationFromET (std::vector<float>& mapping, int referencePitchClass, int channelMask) {
 	if (mapping.size() != 12) {
 		std::cerr << "Error: input mapping must have a size of 12." << std::endl;
 		return;
@@ -2227,7 +2227,7 @@ void MidiMessage::makeMts9_TemperamentByCentsDeviationFromET (std::vector<double
 
 	for (int i=0; i<(int)mapping.size(); i++) {
 		int ii = (i - referencePitchClass + 48) % 12;
-		double value = mapping.at(ii) / 100.0;
+		float value = mapping.at(ii) / 100.0;
 
 		if (value > 1.0) {
 			value = 1.0;
@@ -2253,7 +2253,7 @@ void MidiMessage::makeMts9_TemperamentByCentsDeviationFromET (std::vector<double
 //
 
 void MidiMessage::makeTemperamentEqual(int referencePitchClass, int channelMask) {
-	std::vector<double> temperament(12, 0.0);
+	std::vector<float> temperament(12, 0.0);
 	this->makeMts9_TemperamentByCentsDeviationFromET(temperament, referencePitchClass, channelMask);
 }
 
@@ -2264,16 +2264,16 @@ void MidiMessage::makeTemperamentEqual(int referencePitchClass, int channelMask)
 // MidiMessage::makeTemperamentBad -- Detune by random amounts from equal temperament.
 //
 
-void MidiMessage::makeTemperamentBad(double maxDeviationCents, int referencePitchClass, int channelMask) {
+void MidiMessage::makeTemperamentBad(float maxDeviationCents, int referencePitchClass, int channelMask) {
 	if (maxDeviationCents < 0.0) {
 		maxDeviationCents = -maxDeviationCents;
 	}
 	if (maxDeviationCents > 100.0) {
 		maxDeviationCents = 100.0;
 	}
-	std::vector<double> temperament(12);
-	for (double &item : temperament) {
-		item = ((rand() / (double)RAND_MAX) * 2.0 - 1.0) * maxDeviationCents;
+	std::vector<float> temperament(12);
+	for (float &item : temperament) {
+		item = ((rand() / (float)RAND_MAX) * 2.0 - 1.0) * maxDeviationCents;
 	}
 	this->makeMts9_TemperamentByCentsDeviationFromET(temperament, referencePitchClass, channelMask);
 }
@@ -2286,8 +2286,8 @@ void MidiMessage::makeTemperamentBad(double maxDeviationCents, int referencePitc
 //
 
 void MidiMessage::makeTemperamentPythagorean(int referencePitchClass, int channelMask) {
-	std::vector<double> temperament(12);
-	double x = 1200.0 * log2(3.0 / 2.0);
+	std::vector<float> temperament(12);
+	float x = 1200.0 * log2(3.0 / 2.0);
 	temperament[1]  = x * -5 + 3500; // -9.775 cents
 	temperament[8]  = x * -4 + 2800; // -7.820 cents
 	temperament[3]  = x * -3 + 2100; // -5.865 cents
@@ -2310,9 +2310,9 @@ void MidiMessage::makeTemperamentPythagorean(int referencePitchClass, int channe
 // MidiMessage::makeTemperamentMeantone -- Default type is 1/4-comma meantone.
 //
 
-void MidiMessage::makeTemperamentMeantone(double fraction, int referencePitchClass, int channelMask) {
-	std::vector<double> temperament(12);
-	double x = 1200.0 * log2((3.0/2.0)*pow(81.0/80.0, -fraction));
+void MidiMessage::makeTemperamentMeantone(float fraction, int referencePitchClass, int channelMask) {
+	std::vector<float> temperament(12);
+	float x = 1200.0 * log2((3.0/2.0)*pow(81.0/80.0, -fraction));
 	temperament[1]  = x * -5 + 3500; //  17.107 cents (for fraction = 0.25)
 	temperament[8]  = x * -4 + 2800; //  13.686 cents (for fraction = 0.25)
 	temperament[3]  = x * -3 + 2100; //  10.265 cents (for fraction = 0.25)

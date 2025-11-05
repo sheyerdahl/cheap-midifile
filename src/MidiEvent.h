@@ -56,11 +56,11 @@ class MidiEvent : public MidiMessage {
 		MidiEvent* getLinkedEvent        (void);
 		const MidiEvent* getLinkedEvent  (void) const;
 		int        getTickDuration       (void) const;
-		double     getDurationInSeconds  (void) const;
+		float     getDurationInSeconds  (void) const;
 
 		int        tick;     // delta or absolute MIDI ticks
 		int        track;    // [original] track number of event in MIDI file
-		double     seconds;  // calculated time in sec. (after doTimeAnalysis())
+		float     seconds;  // calculated time in sec. (after doTimeAnalysis())
 		int        seq;      // sorting sequence number of event
 
 	private:
